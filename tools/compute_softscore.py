@@ -4,7 +4,7 @@ import sys
 import json
 import numpy as np
 import re
-import cPickle
+import _pickle as cPickle
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from dataset import Dictionary
@@ -142,7 +142,8 @@ def filter_answers(answers_dset, min_occurence):
         if gtruth not in occurence:
             occurence[gtruth] = set()
         occurence[gtruth].add(ans_entry['question_id'])
-    for answer in occurence.keys():
+    # for answer in occurence.keys():
+    for answer in list(occurence):
         if len(occurence[answer]) < min_occurence:
             occurence.pop(answer)
 
@@ -166,8 +167,9 @@ def create_ans2label(occurence, name, cache_root='data/cache'):
         ans2label[answer] = label
         label += 1
 
-    utils.create_dir(cache_root)
-
+    # utils.create_dir(cache_root)
+    if not os.path.exists(cache_root):
+        os.makedirs(cache_root)
     cache_file = os.path.join(cache_root, name+'_ans2label.pkl')
     cPickle.dump(ans2label, open(cache_file, 'wb'))
     cache_file = os.path.join(cache_root, name+'_label2ans.pkl')
@@ -206,7 +208,9 @@ def compute_target(answers_dset, ans2label, name, cache_root='data/cache'):
             'scores': scores
         })
 
-    utils.create_dir(cache_root)
+    # utils.create_dir(cache_root)
+    if not os.path.exists(cache_root):
+        os.makedirs(cache_root)
     cache_file = os.path.join(cache_root, name+'_target.pkl')
     cPickle.dump(target, open(cache_file, 'wb'))
     return target
